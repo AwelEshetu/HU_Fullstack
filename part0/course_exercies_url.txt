@@ -1,0 +1,3 @@
+to exercies submission: https://studies.cs.helsinki.fi/fullstackopen2019/#/submissions
+course_home_page: https://fullstackopen.com/en/part0/fundamentals_of_web_apps
+uml_diagrams: https://www.websequencediagrams.com/
