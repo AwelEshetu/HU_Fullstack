@@ -10,26 +10,26 @@ const Header=(props)=>{
 }
 const Part=(props)=>{
    return (
-      props.parts.map((part)=>
+      props.parts.map(({name,exercises})=>
         <>
-       <p key={part.name}>{part.name} {part.exercises}</p>
+       <p key={name}>{name} {exercises}</p>
        </>                 
     )
        
    ) 
 }
-const Content=(props)=>{
+const Content=({parts})=>{
     return(
         <>
-        <Part parts={props.parts} />
+        <Part parts={parts} />
         </>
     )
 }
-const Total=(props)=>{
-    let total=props.total.reduce((a,b)=>a+b);
+const Total=({total})=>{
+    let sum=total.reduce((a,b)=>a+b);
     return(
         <>
-        <p>Number of exercises {total}</p>
+        <p>Number of exercises {sum}</p>
         </>
     )
 }
