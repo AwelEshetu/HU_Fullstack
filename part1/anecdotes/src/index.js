@@ -21,21 +21,26 @@ const App = () => {
         [votes,setVote]=useState(new Array(anecdotes.length).fill(0)),
         handleVote=()=>{
             
-                  votes[selected]+=1;
+            votes[selected]+=1;
             
             setVote([...votes])
-            console.log(selected,votes);
             
-        };
-
+            
+        },
+        mostVote=Math.max(...votes),
+        mostVotedAnecdote=anecdotes.filter((anecdote,index)=>votes[index]===mostVote)[0];
+      
             
   
   return (
     <div>
+      <h1>Anecdote of the day</h1>
       <p>{anecdotes[selected]}</p>
       <p>has {votes[selected]} votes</p>
       <Button onClick={handleVote} text='vote' /> 
-      <Button onClick={handleAnecdote} text='next anecdote' /> 
+      <Button onClick={handleAnecdote} text='next anecdote' />
+      <h2>Anecdote with most votes</h2>
+      <p> {mostVotedAnecdote}</p>
     </div>
   )
 }
