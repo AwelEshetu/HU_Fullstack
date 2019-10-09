@@ -21,10 +21,10 @@ const App = () => {
       }
     ]
   }
-
+ const total=course.parts.map(part=>part.exercises).reduce((prev,next)=>prev+next);
   return (
     <div>      
-      <Course course={course} />    
+      <Course course={course} total={total}/>    
     </div>
   )
 }
