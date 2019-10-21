@@ -2,37 +2,26 @@ import React, { useState,useEffect } from 'react'
 import Person from './components/person';
 import Filter from './components/filter';
 import PersonForm from './components/addPerson';
-import axios from 'axios';
+import personsService from './services/persons';
+import Notification from './components/notification';
 const App = () => {
   const [ persons, setPersons] = useState([]) 
   const [ newName, setNewName ] = useState('')
   const [newNumber,setNewNumber]=useState('')
+  const [errorMessage, setErrorMessage] = useState(null)
+  const [notificationMessage, setnotificationMessage] = useState(null)
   
   useEffect(()=>{
-      axios
-         .get('http://localhost:3001/persons')
-         .then(resp => {
-        setPersons(resp.data)
-        })
+     personsService
+     .getAll()
+     .then(resp=>{
+         setPersons(resp)
+     })
       
   },[]);
-    
-  const addPerson = (event) => {
-    event.preventDefault()
-   const personObject = {
-    name: newName,
-    number:newNumber
-  }
-     if(persons.map(person=>person.name).includes(newName)){
-         alert(`${newName} is already added to phonebook`);
-     }else{
-         setPersons(persons.concat(personObject))
-     }   
-      setNewName('')
-      setNewNumber('')
-  }
-  
-  const handleNameChange=(event)=>{
+   
+ //add new name and number 
+ const handleNameChange=(event)=>{
    
     setNewName(event.target.value);
  }
@@ -40,10 +29,98 @@ const App = () => {
      setNewNumber(event.target.value);
  }
  
+  const addPerson = (event) => {
+    event.preventDefault()
+   const personObject = {
+    name: newName,
+    number:newNumber,
+    id:persons.length+1
+  }
+     if(persons.map(person=>person.name).includes(newName)){
+         let personToChange=persons.find(person=>person.name===newName),
+             id=personToChange.id,
+             changedData={...personToChange,number:newNumber};
+        // console.log(personToChange, id)
+        if(personToChange.number===newNumber){
+            alert(`${newName} is already added to phonebook`);
+        }else{
+            let approve=window.confirm(`${newName} is already added to phonebook, replace the old number with new one?`);
+            
+            if(approve){
+              personsService
+             .update(id,changedData)
+             .then(resp=>{
+                 setPersons(persons.map(person=>person.id!==id ? person: resp))
+                  setnotificationMessage(
+                  `Changed ${personToChange.name}'s number`
+                )
+                setTimeout(() => {
+                  setnotificationMessage(null)
+                }, 5000)
+
+             })
+            .catch(error=>{
+             setErrorMessage(
+              `Information of ${personToChange.name} was already removed from server`
+            )
+            
+            setTimeout(() => {
+              setErrorMessage(null)
+              
+            }, 5000)
+            setPersons(persons.filter(person=>person.id!==id ));
+             });
+            }
+        } 
+            
+       
+     }else{
+         personsService
+         .create(personObject)
+         .then(resp=>{
+             setPersons(persons.concat(resp))
+              setnotificationMessage(
+                  `Added ${newName}`
+                )
+                setTimeout(() => {
+                  setnotificationMessage(null)
+                }, 5000)
+         });
+     }
+       
+      setNewName('')
+      setNewNumber('') 
+  }
+  
+  
+ 
+ const handleDelete=(id)=>{
+     //alert(JSON.stringify(persons.filter(person=>person.id===id)))
+     let nameToDelete=persons.filter(person=>person.id===id)[0].name,
+         approve=window.confirm(`Are you sure about deleting ${nameToDelete} ?`);
+     if(approve){
+         personsService
+         .remove(id)
+         .then(resp=>{
+             setPersons(persons.filter(person=>person.id!==id))
+             
+         })
+        
+     }
+   
+ }
+ 
  const handleNameSearch=(event)=>{
-     
+     //console.log(event.target.value)
+    // alert(event.target.value==='')
      let personCopy=persons.slice();
-     if(event.target.value!==''){
+     if(event.target.value===''){
+          personsService
+         .getAll()
+         .then(resp=>{
+             setPersons(resp)
+         })
+     }else{
          let nameFiltered= event.target.value;
          let filteredPersons=personCopy.filter(person=>person.name.toLowerCase().startsWith(nameFiltered.toLowerCase()))
          setPersons(filteredPersons);
@@ -54,11 +131,12 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+       <Notification message={notificationMessage} error={errorMessage}/>
        <Filter search={handleNameSearch}/>
       <h2>add a new </h2>
       <PersonForm submitPerson={addPerson} addName={handleNameChange} addNumber={handleNumberChange} name={newName} number={newNumber}/>
       <h2>Numbers</h2>
-       <Person persons={persons} />
+       <Person persons={persons} removeNumber={handleDelete}/>
     </div>
   )
 }
