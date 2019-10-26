@@ -36,7 +36,7 @@ const errorHandler = (error, request, response, next) => {
 
 app.use(errorHandler)
 
-//send index page
+//send index page to browser
   app.get("/", (req, res) => {
     res.sendFile(path.join((__dirname,"build/index.html")));
   });
