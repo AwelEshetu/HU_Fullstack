@@ -1,9 +1,11 @@
+require('dotenv').config()
 const express = require('express'),
       bodyParser = require('body-parser'),
       morgan=require('morgan'),
       cors = require('cors'),
+      Person = require('./models/person')
       app = express(),
-      PORT = process.env.PORT || 3001;
+      PORT = process.env.PORT;
 app.use(bodyParser.json());
 app.use(cors());
 
@@ -12,28 +14,7 @@ morgan.token('body', function (req, res) { return JSON.stringify(req.body) });
 app.use(morgan(':method :url :status :response-time ms :body '));
 
 
-let persons=[
-    {
-      "name": "Arto Hellas",
-      "number": "040-123456",
-      "id": 1
-    },
-    {
-      "name": "Ada Lovelace",
-      "number": "39-44-5323523",
-      "id": 2
-    },
-    {
-      "name": "Dan Abramov",
-      "number": "12-43-234345",
-      "id": 3
-    },
-    {
-      "name": "Mary Poppendieck",
-      "number": "39-23-6423122",
-      "id": 4
-    }
-  ]
+
 const generateId = () => {
   const maxId = persons.length > 0
     ? Math.max(...persons.map(n => n.id))
@@ -42,7 +23,7 @@ const generateId = () => {
 }
 
 
-  app.use(express.static("build"));
+ app.use(express.static("build"));
   app.get("/", (req, res) => {
     res.sendFile(path.join((__dirname,"build/index.html")));
   });
@@ -56,18 +37,15 @@ app.get('/info',(req,res)=>{
 `)
 });
 app.get('/api/persons', (req, res) => {
-  res.json(persons)
+  Person.find({}).then(persons => {
+    res.json(persons.map(person => person.toJSON()))
+  })
 })
 
 app.get('/api/persons/:id', (request, response) => {
-  const id = Number(request.params.id)
-  const person = persons.find(person =>  person.id === id)
-  
- if (person) {
-    response.json(person)
-  } else {
-    response.status(404).end()
-  }
+ Person.findById(request.params.id).then(person => {
+    response.json(person.toJSON())
+  })
 })
 
 
@@ -80,21 +58,15 @@ app.post('/api/persons', (request, response) => {
     })
   }
   
- if (persons.map(person=>person.name).includes(body.name)) {
-    return response.status(400).json({ 
-      error: 'name must be unique' 
-    })
-  }
-  const person = {
+  const person =new Person({
     name: body.name,
     number: body.number,
-    date: new Date(),
-    id: generateId(),
-  }
+    date: new Date()
+  });
 
-  persons = persons.concat(person)
-
-  response.json(person)
+  person.save().then(savedPerson => {
+    response.json(savedPerson.toJSON())
+  })
 })
 
 app.delete('/api/persons/:id', (request, response) => {
