@@ -1,4 +1,5 @@
-const mongoose = require('mongoose')
+const mongoose = require('mongoose'),
+      uniqueValidator = require('mongoose-unique-validator');
 mongoose.set('useFindAndModify', false)
 const url = process.env.MONGODB_URI
 
@@ -13,10 +14,11 @@ mongoose.connect(url, { useNewUrlParser: true })
   })
 
 const phoneBookSchema = new mongoose.Schema({
-  name: String,
-  number:String,
+  name: { type: String, minlength: [3, 'Too few characters for a name'],required: true, unique: true },
+  number:{ type: String, minlength: [8, 'Too few digits for a phone number'],required: true, unique: true },
   date: Date,
 })
+phoneBookSchema.plugin(uniqueValidator, { message: 'Error, expected {PATH} to be unique.' });
 
 phoneBookSchema.set('toJSON', {
   transform: (document, returnedObject) => {
