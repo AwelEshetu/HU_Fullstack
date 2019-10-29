@@ -36,13 +36,24 @@ const App = () => {
     number:newNumber,
     id:persons.length+1
   }
-     if(persons.map(person=>person.name).includes(newName)){
+  let personArray=persons.map(person=>person.name);
+    
+	
+     if(personArray.indexOf(newName)> -1){
          let personToChange=persons.find(person=>person.name===newName),
              id=personToChange.id,
              changedData={...personToChange,number:newNumber};
-        // console.log(personToChange, id)
+		
         if(personToChange.number===newNumber){
-            alert(`${newName} is already added to phonebook`);
+            setErrorMessage(
+              `${newName} is already added to phonebook`
+            )
+            
+            setTimeout(() => {
+              setErrorMessage(null)
+              
+            }, 5000)
+            
         }else{
             let approve=window.confirm(`${newName} is already added to phonebook, replace the old number with new one?`);
             
@@ -50,6 +61,7 @@ const App = () => {
               personsService
              .update(id,changedData)
              .then(resp=>{
+				 
                  setPersons(persons.map(person=>person.id!==id ? person: resp))
                   setnotificationMessage(
                   `Changed ${personToChange.name}'s number`
@@ -77,15 +89,23 @@ const App = () => {
      }else{
          personsService
          .create(personObject)
-         .then(resp=>{
-             setPersons(persons.concat(resp))
+         .then(response=>{
+			 
+             setPersons(persons.concat(response))
               setnotificationMessage(
-                  `Added ${newName}`
+                  `Added ${newName} to the phonebook`
                 )
                 setTimeout(() => {
                   setnotificationMessage(null)
                 }, 5000)
-         });
+         }).catch(error=>{
+			 //console.log(JSON.stringify(error.response))
+			 setErrorMessage(error.response.data.error)
+            setTimeout(() => {
+              setErrorMessage(null)
+              
+            }, 5000)
+		 });
      }
        
       setNewName('')

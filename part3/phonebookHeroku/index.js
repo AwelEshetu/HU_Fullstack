@@ -1,4 +1,14 @@
-require('dotenv').config()
+const app = require('./app') // the actual Express app
+const http = require('http')
+const config = require('./utils/config')
+
+const server = http.createServer(app)
+
+server.listen(config.PORT, () => {
+  console.log(`Server running on port ${config.PORT}`)
+})
+
+/*require('dotenv').config()
 const express = require('express'),
       bodyParser = require('body-parser'),
       morgan=require('morgan'),
@@ -22,7 +32,7 @@ app.use(morgan(':method :url :status :response-time ms :body '));
 }
 
 app.use(unknownEndpoint)*/
-
+/*
 //error handler middleware
 const errorHandler = (error, request, response, next) => {
   console.error(error.message)
@@ -115,4 +125,4 @@ app.delete('/api/persons/:id', (request, response,next) => {
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
-})
+})*/
