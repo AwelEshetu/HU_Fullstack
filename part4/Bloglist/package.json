@@ -4,9 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-     "start": "node index.js",
-    "watch": "nodemon index.js"
+    "test": "jest --verbose",
+    "start": "node index.js",
+    "watch": "nodemon index.js",
+    "lint": "eslint ."
   },
   "author": "Awel Eshetu",
   "license": "ISC",
@@ -17,6 +18,11 @@
     "mongoose": "^5.7.7"
   },
   "devDependencies": {
+    "eslint": "^6.6.0",
+    "jest": "^24.9.0",
     "nodemon": "^1.19.4"
+  },
+  "jest": {
+    "testEnvironment": "node"
   }
 }
