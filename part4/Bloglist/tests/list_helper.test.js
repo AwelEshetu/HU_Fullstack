@@ -1,98 +1,5 @@
-const listHelper = require('../utils/list_helper')
-const blogs = [
-  {
-    _id: "5a422a851b54a676234d17f7",
-    title: "React patterns",
-    author: "Michael Chan",
-    url: "https://reactpatterns.com/",
-    likes: 7,
-    __v: 0
-  },
-  {
-    _id: "5a422aa71b54a676234d17f8",
-    title: "Go To Statement Considered Harmful",
-    author: "Edsger W. Dijkstra",
-    url: "http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html",
-    likes: 5,
-    __v: 0
-  },
-  {
-    _id: "5a422b3a1b54a676234d17f9",
-    title: "Canonical string reduction",
-    author: "Edsger W. Dijkstra",
-    url: "http://www.cs.utexas.edu/~EWD/transcriptions/EWD08xx/EWD808.html",
-    likes: 12,
-    __v: 0
-  },
-  {
-    _id: "5a422b891b54a676234d17fa",
-    title: "First class tests",
-    author: "Robert C. Martin",
-    url: "http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.htmll",
-    likes: 10,
-    __v: 0
-  },
-  {
-    _id: "5a422ba71b54a676234d17fb",
-    title: "TDD harms architecture",
-    author: "Robert C. Martin",
-    url: "http://blog.cleancoder.com/uncle-bob/2017/03/03/TDD-Harms-Architecture.html",
-    likes: 0,
-    __v: 0
-  },
-  {
-    _id: "5a422bc61b54a676234d17fc",
-    title: "Type wars",
-    author: "Robert C. Martin",
-    url: "http://blog.cleancoder.com/uncle-bob/2016/05/01/TypeWars.html",
-    likes: 2,
-    __v: 0
-  }  
-],
-emptyList=[],
-listWithOneBlog = [
-    {
-      _id: '5a422aa71b54a676234d17f8',
-      title: 'Go To Statement Considered Harmful',
-      author: 'Edsger W. Dijkstra',
-      url: 'http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html',
-      likes: 5,
-      __v: 0
-    }
-  ];
-listWithEqualLikes=[
-    {
-    _id: "5a422ba71b54a676234d17fb",
-    title: "TDD harms architecture",
-    author: "Robert C. Martin",
-    url: "http://blog.cleancoder.com/uncle-bob/2017/03/03/TDD-Harms-Architecture.html",
-    likes: 12,
-    __v: 0
-  },
-  {
-    _id: "5a422bc61b54a676234d17fc",
-    title: "Type wars",
-    author: "Robert C. Martin",
-    url: "http://blog.cleancoder.com/uncle-bob/2016/05/01/TypeWars.html",
-    likes: 12,
-    __v: 0
-  },{
-    _id: "5a422b891b54a676234d17fa",
-    title: "First class tests",
-    author: "Robert C. Martin",
-    url: "http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.htmll",
-    likes: 10,
-    __v: 0
-  },
-  {
-    _id: "5a422ba71b54a676234d17fb",
-    title: "TDD harms architecture",
-    author: "Robert C. Martin",
-    url: "http://blog.cleancoder.com/uncle-bob/2017/03/03/TDD-Harms-Architecture.html",
-    likes: 0,
-    __v: 0
-  }  
-];
+/*const listHelper = require('../utils/list_helper')
+
 
 test('dummy returns one', () => {
   const blogs = []
@@ -147,6 +54,7 @@ test('blog post with most likes with two or more equally favorite posts',()=>{
     let maxLikes=Math.max(...listWithEqualLikes.map(blog=>blog.likes)),
         favPost=blogLists.filter(blog=>blog.likes===maxLikes)[0];  
     expect(result).toEqual(favPost);
+    
    
    
     
@@ -193,9 +101,24 @@ test('author with most blogs with non empty list ',()=>{
      mostBlogs=blogLists.filter(item=> item.blogs===maxBlog)[0];
     
     expect(result).toEqual(mostBlogs);
+     
     
 });
  
+test('author with most blogs with two lists of different authors ',()=>{
+    const result=listHelper.mostBlogs(blogs);
+     let blogLists=[],
+        authors=[...new Set(blogs.map(blog=>blog.author))];
+    for(let name of authors){
+        let totalBlogs=blogs.map(blog=>blog.author===name).length;
+        blogLists.push({author:name,blogs:totalBlogs})
+    }
+ let maxBlog=Math.max(...blogLists.map(item=>item.blogs)),
+     mostBlogs=blogLists.filter(item=> item.blogs===maxBlog)[0];
+    
+    expect(result).toEqual(mostBlogs);
+    
+});
 })
 
 //most Likes  
@@ -220,8 +143,91 @@ test('author who has most liked blog posts with non empty list ',()=>{
       mostLikedAuthor=blogLists.filter(item=> item.likes===maxLikes)[0];
     
     expect(result).toEqual(mostLikedAuthor);
+   
+   
     
 });
- 
+    
+test('author who has most liked blog posts with two equally liked blogposts ',()=>{
+    const result=listHelper.mostLikes(blogs);
+     let blogLists=[],
+        authors=[...new Set(blogs.map(blog=>blog.author))];
+       
+    for(let name of authors){
+        let totalLikes=blogs.map(blog=>blog.author===name ? blog.likes : 0 ).reduce((prev,next)=>prev+next, 0);
+        blogLists.push({author:name,likes:totalLikes})
+    }
+    let maxLikes=Math.max(...blogLists.map(item=>item.likes)),
+      mostLikedAuthor=blogLists.filter(item=> item.likes===maxLikes)[0];
+    
+    expect(result).toEqual(mostLikedAuthor);
+    
+}); 
 
+})*/
+
+const supertest = require('supertest')
+const mongoose = require('mongoose')
+const helper = require('./test_helper')
+const app = require('../app')
+const api = supertest(app)
+
+const Blog = require('../models/blog')
+
+
+beforeEach(async () => {
+  await Blog.deleteMany({})
+
+  for (let blog of helper.initialBlogs) {
+    let blogObject = new Blog(blog)
+    await blogObject.save()
+  }
 })
+
+test('blogs are returned as json', async () => {
+  await api
+    .get('/api/blogs')
+    .expect(200)
+    .expect('Content-Type', /application\/json/)
+})
+
+test('all blogs are returned', async () => {
+  const response = await api.get('/api/blogs')
+
+  expect(response.body.length).toBe(helper.initialBlogs.length)
+})
+
+//testing post 
+
+test('a valid post can be added ', async () => {
+  const newBlog = 
+    {
+    _id: "5a422ba71b54a676234d17f6",
+    title: "TDD harms architecture",
+    author: "Robert C. Martin",
+    url: "http://blog.cleancoder.com/uncle-bob/2017/03/03/TDD-Harms-Architecture.html",
+    likes: 15,
+    __v: 0
+  }
+  
+
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+
+
+  const blogsAtEnd = await helper.blogsInDb()
+  expect(blogsAtEnd.length).toBe(helper.initialBlogs.length + 1)
+
+  const title = blogsAtEnd.map(blog => blog.title)
+ 
+  expect(title).toContainEqual (
+    'TDD harms architecture'
+  )
+})
+
+afterAll(() => {
+  mongoose.connection.close()
+}) 
