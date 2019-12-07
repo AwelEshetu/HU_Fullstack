@@ -5,7 +5,33 @@ const app = require('../app')
 const api = supertest(app)
 
 const Blog = require('../models/blog')
+const User = require('../models/user')
+const bcrypt = require('bcrypt')
 
+// login and get token before every post request
+let token=null;
+beforeAll(  async () => {
+          const newUser = {
+                          username: 'pasta',
+                          name: 'Holly Cows',
+                          password: 'salainen',
+                        }
+
+                await api
+                  .post('/api/users')
+                  .send(newUser);
+          
+       const res= await api
+          .post('/api/login')
+          .send({
+             "username": "pasta",
+              "password": "salainen"
+          });
+         // console.log('response body '+ JSON.stringify(res));
+          token = res.body.token; 
+          console.log(`token from response ${token}`)
+            
+      },30000); 
 
 beforeEach(async () => {
   await Blog.deleteMany({})
@@ -34,11 +60,10 @@ describe('when there is initially some Blogs saved', () => {
 
     test('check for unique identifier id ', async () => {
         const blogs= await api.get('/api/blogs');
-
-        for( let blog of blogs.body){
+       console.log(`blogs to be mentioned ${JSON.stringify(blogs)}`)
+      for( let blog of blogs.body){
             expect(blog.id).toBeDefined();
         }
-
     });
     
 });
@@ -90,6 +115,7 @@ describe('addition of a new blog', () => {
 
       await api
         .post('/api/blogs')
+        .set('Authorization', `bearer ${token}`)
         .send(newBlog)
         .expect(201)
         .expect('Content-Type', /application\/json/)
@@ -118,6 +144,7 @@ describe('addition of a new blog', () => {
     // add new blog without likes 
       await api
         .post('/api/blogs')
+        .set('Authorization', `bearer ${token}`)
         .send(newBlog)
         .expect(201)
         .expect('Content-Type', /application\/json/)
@@ -141,6 +168,7 @@ describe('addition of a new blog', () => {
 
         await api
         .post('/api/blogs')
+        .set('Authorization', `bearer ${token}`)
         .send(newBlog)
         .expect(400);
 
@@ -153,7 +181,7 @@ describe('deletion of a blog', () => {
       const blogToDelete = blogsAtStart[0]
 
       await api
-        .delete(`/api/blogs/${blogToDelete.id}`)
+        .delete(`/api/blogs/${blogToDelete.id}`)     
         .expect(204)
 
       const blogsAtEnd = await helper.blogsInDb()
@@ -187,6 +215,61 @@ describe('updating likes of a blog', () => {
         
     })
   })
+
+//testing users 
+
+describe('when there is initially one user at db', () => {
+  beforeEach(async () => {
+    await User.deleteMany({})
+    const user = new User({ username: 'root', password: 'sekret' })
+    await user.save()
+  })
+
+  test('creation succeeds with a fresh username', async () => {
+    const usersAtStart = await helper.usersInDb()
+
+    const newUser = {
+      username: 'aweleshetu',
+      name: 'Awel Eshetu',
+      password: 'fentaw',
+    }
+
+    await api
+      .post('/api/users')
+      .send(newUser)
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+
+    const usersAtEnd = await helper.usersInDb()
+    expect(usersAtEnd.length).toBe(usersAtStart.length + 1)
+
+    const usernames = usersAtEnd.map(u => u.username)
+    expect(usernames).toContain(newUser.username)
+  })
+    
+ test('creation fails with proper statuscode and message if username already taken', async () => {
+    const usersAtStart = await helper.usersInDb()
+
+    const newUser = {
+      username: 'root',
+      name: 'Superuser',
+      password: 'superuser',
+    }
+
+    const result = await api
+      .post('/api/users')
+      .send(newUser)
+      .expect(400)
+      .expect('Content-Type', /application\/json/)
+
+    expect(result.body.error).toContain('`username` to be unique')
+
+    const usersAtEnd = await helper.usersInDb()
+    expect(usersAtEnd.length).toBe(usersAtStart.length)
+  })
+    
+ 
+})
 
 afterAll(() => {
   mongoose.connection.close()
