@@ -103,10 +103,12 @@ blogsRouter.put('/:id', async (request, response, next) => {
   const blog = {
     likes: body.likes,
   }
-
-  
+ //, { new: true }
+  console.log('blog from update api ' +JSON.stringify(blog));
+  console.log('body from update api ' +JSON.stringify(body));
     try{
-       const updatedBlog= await Blog.findByIdAndUpdate(request.params.id, blog, { new: true });
+       const updatedBlog= await Blog.findByIdAndUpdate(request.params.id, blog);
+	   console.log('updated blog from update api ' +JSON.stringify(updatedBlog));
        response.json(updatedBlog.toJSON()) 
     }catch(error){
         next(error)
