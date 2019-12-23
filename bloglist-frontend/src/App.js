@@ -1,9 +1,11 @@
 import React ,{ useState, useEffect } from 'react';
 import Blog from './components/Blog' ;
 import Notification from './components/Notification'
-
+import LoginForm from './components/LoginForm'
+import BlogForm from './components/BlogForm'
 import blogService from './services/blogs' ;
 import loginService from './services/login' ;
+import Togglable from './components/Togglable'
 
 const App =()=>{
     
@@ -16,6 +18,7 @@ const App =()=>{
       const [title, setTitle] = useState('')
       const [author, setAuthor] = useState('') 
       const [url, setUrl] = useState('') 
+      const [loginVisible, setLoginVisible] = useState(false)
   
  //get all the blogs 
   useEffect(() => {
@@ -23,6 +26,7 @@ const App =()=>{
       .getAll()
       .then(initialBlogs => setBlogs(initialBlogs))
   }, [])
+ 
       
   //save token to local storage    
   useEffect(() => {
@@ -75,10 +79,11 @@ const App =()=>{
       }, 5000)
     }
  }
- 
+ const blogFormRef = React.createRef()
  //add new blog 
   const addBlog = async (event) => {
     event.preventDefault()
+    blogFormRef.current.toggleVisibility()
     const blogObject = {
       title: title,
       author: author,
@@ -105,94 +110,109 @@ const App =()=>{
    }
    
   }
+  
  //generate blogs
+ //handle likes
+  const handleLike= async (id) => {  
+            const blog = blogs.find(n => n.id === id)
+            const like=blog.likes+1;
+            const newBlog={ ...blog,likes:like}
+      
+      try{
+          
+           const updatedBlog=await blogService.update(id, newBlog);
+           setBlogs(blogs.map(blog=>blog.id!==id ? blog : {...blog, likes: like} ))
+           
+      }catch(exception){
+           // console.log('there is some exception'+JSON.stringify(exception))
+            setIsError(true)
+            setErrorMessage(`Blog '${blog.title}' was already removed from server`)
+            setTimeout(() => {setErrorMessage(null)}, 5000)
+            setBlogs(blogs.filter(n => n.id !== id))
+      }
+  }
+    
+ const handleRemove= async (id)=>{
+     const blog = blogs.find(n => n.id === id);
+     //console.log('blog contains '+JSON.stringify(blog));
+     //console.log('user '+JSON.stringify(user));
+     
+     try{
+         let confirmToDelete=window.confirm(`remove blog ${blog.title} by ${blog.author}`);
+        //alert(`your response is ${confirmToDelete}`);
+        if(confirmToDelete && blog.user.username===user.username){
+            await blogService.remove(id);
+            setBlogs(blogs.filter(n => n.id !== id))
+        }
+         
+     }catch(exception){
+            setIsError(true)
+            setErrorMessage(`Blog '${blog.title}' was already removed from server`)
+            setTimeout(() => {setErrorMessage(null)}, 5000)
+            setBlogs(blogs.filter(n => n.id !== id))
+     }
+ }
  const blogForm = () => ( 
     <>
      {
-     blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} />
+     blogs.sort((prev,current)=>current.likes - prev.likes).map(blog =>
+        <Blog key={blog.id} user={user} blog={blog} handleLike={()=>handleLike(blog.id)} handleRemove={()=>handleRemove(blog.id)}/>
       )}
     </>
   )  
+  
  //login form 
- const loginForm = () => (
-     <>
-     <h2>Login got application </h2>
-    <form onSubmit={handleLogin}>
+  const loginForm = () => {
+    const hideWhenVisible = { display: loginVisible ? 'none' : '' }
+    const showWhenVisible = { display: loginVisible ? '' : 'none' }
+
+    return (
       <div>
-        username
-          <input
-          type="text"
-          value={username}
-          name="Username"
-          onChange={({ target }) => setUsername(target.value)}
-        />
+        <div style={hideWhenVisible}>
+          <button onClick={() => setLoginVisible(true)}>log in</button>
+        </div>
+        <div style={showWhenVisible}>
+          <LoginForm
+            username={username}
+            password={password}
+            handleUsernameChange={({ target }) => setUsername(target.value)}
+            handlePasswordChange={({ target }) => setPassword(target.value)}
+            handleSubmit={handleLogin}
+          />
+          <button onClick={() => setLoginVisible(false)}>cancel</button>
+        </div>
       </div>
-      <div>
-        password
-          <input
-          type="password"
-          value={password}
-          name="Password"
-          onChange={({ target }) => setPassword(target.value)}
-        />
-      </div>
-      <button type="submit">login</button>
-    </form>
-    </>
-  )
-  //logout buttton 
+    )
+  }
+  
+//logout buttton 
   const logOut= ()=>(
       <>
         <button onClick={handleLogout}>Logout</button>
       </>
   )
   
-  const createBlogForm=()=>(
-  <form onSubmit={addBlog}>
-      <div>
-        title :
-          <input
-          type="text"
-          value={title}
-          name="Title"
-          onChange={({ target }) => setTitle(target.value)}
-        />
-      </div>
-      <div>
-        author :
-          <input
-          type="text"
-          value={author}
-          name="Author"
-          onChange={({ target }) => setAuthor(target.value)}
-        />
-      </div>
-      <div>
-        url :
-          <input
-          type="text"
-          value={url}
-          name="Url"
-          onChange={({ target }) => setUrl(target.value)}
-        />
-      </div>
-      <button type="submit">create</button>
-    </form>
-  
-  )
-  
   //render dev 
   return (
     <div className="App">
       <Notification message={errorMessage} error={isError}/>
-       {user === null ?
+     
+      {user === null ?
         loginForm() :
         <div>
-          <h2>Blogs</h2>
           <p>{user.name} logged in {logOut()}</p>
-          {createBlogForm()}
-          {blogForm()}
+          <Togglable buttonLabel="new blog" ref={blogFormRef}>
+            <BlogForm
+              onSubmit={addBlog}
+              title={title}
+              author={author}
+              url={url}
+              handleTitle={({ target }) => setTitle(target.value)}
+              handleAuthor={({ target }) => setAuthor(target.value)}
+              handleUrl={({ target }) => setUrl(target.value)}
+            />
+          </Togglable>
+         {blogForm()}
         </div>
       }
       
