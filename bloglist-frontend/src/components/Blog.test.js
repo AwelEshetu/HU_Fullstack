@@ -24,7 +24,7 @@ test('at start the children are not displayed', () => {
     <Blog blog={blog} user={user} />
   )
   
-    component.debug()  
+    //component.debug()  
     const div = component.container.querySelector('.showDetail')
     expect(div).toHaveStyle('display: none')
 
@@ -48,7 +48,7 @@ test('after clicking the button, children are displayed', () => {
    const component = render(
     <Blog blog={blog} user={user}/>
   )
-   
+   //component.debug()  
     const div = component.container.querySelector('.makeVisible')
     const div2 = component.container.querySelector('.showDetail')
     fireEvent.click(div)

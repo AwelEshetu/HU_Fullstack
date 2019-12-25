@@ -18,7 +18,7 @@ test('renders content', () => {
     <SimpleBlog blog={blog} />
   )
   
-  component.debug() 
+ // component.debug() 
     
   const div = component.container.querySelector('.tileAuthor')
   expect(div).toHaveTextContent(
