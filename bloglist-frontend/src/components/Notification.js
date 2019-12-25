@@ -6,12 +6,12 @@ const Notification = ({ message,error }) => {
   }
   if(message!==null && !error){
     return (
-    <div className="notification">
-      {message}
-    </div>
-    )  
+      <div className="notification">
+        {message}
+      </div>
+    )
   }
-    
+
   return (
     <div className="error">
       {message}
