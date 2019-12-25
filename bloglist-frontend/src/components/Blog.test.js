@@ -50,7 +50,8 @@ test('after clicking the button, children are displayed', () => {
   )
    
     const div = component.container.querySelector('.makeVisible')
+    const div2 = component.container.querySelector('.showDetail')
     fireEvent.click(div)
 
-    expect(div).not.toHaveStyle('display: none')
+    expect(div2).not.toHaveStyle('display: none')
 })
