@@ -42,10 +42,10 @@ const Blog = ({ blog, handleLike,handleRemove,user }) => {
 
   return  (
     <div style={blogStyle} >
-      <div onClick={() => setDetailVisible(!detailVisible)}>
+      <div onClick={() => setDetailVisible(!detailVisible)} className="makeVisible">
         <p>{blog.title} {blog.author}</p>
       </div>
-      <div style={detailVisiblityControl}>
+      <div style={detailVisiblityControl}  className="showDetail" >
         <a target="_blank" rel="noopener noreferrer" href={blog.url} >{blog.url}</a>
         <p>{blog.likes} likes {Likes(blog.id)}</p>
         <p>added by {blog.user.name}</p>
