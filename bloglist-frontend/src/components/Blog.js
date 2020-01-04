@@ -41,7 +41,7 @@ const Blog = ({ blog, handleLike,handleRemove,user }) => {
 
 
   return  (
-    <div style={blogStyle} >
+    <div style={blogStyle} className="blogs">
       <div onClick={() => setDetailVisible(!detailVisible)} className="makeVisible">
         <p>{blog.title} {blog.author}</p>
       </div>
