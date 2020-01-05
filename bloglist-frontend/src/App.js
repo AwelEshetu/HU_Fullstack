@@ -13,11 +13,10 @@ const App =() => {
   const [blogs, setBlogs] = useState([])
   const [errorMessage, setErrorMessage] = useState(null)
   const [isError,setIsError]=useState(true)
-  //const [username, setUsername] = useState('')
-  //const [password, setPassword] = useState('')
+
   const [username] = useField('text')
   const [password] = useField('password')
-  const [reset] = useField('')
+ 
   const [user, setUser] = useState(null)
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
@@ -55,10 +54,7 @@ const App =() => {
       )
       blogService.setToken(user.token)
       setUser(user)
-      //username.reset()
-      // password.reset()
-      // setUsername('')
-      //setPassword('')
+    
     } catch (exception) {
       setIsError(true)
       setErrorMessage('Wrong credentials')
@@ -71,13 +67,12 @@ const App =() => {
   const handleLogout=async (event) => {
     event.preventDefault()
     try {
-
-      window.localStorage.removeItem('loggedBlogappUser')
-
-      blogService.setToken(null)
-      setUser(null)
-      //setUsername('')
-      //setPassword('')
+        
+        setUser(null)
+        blogService.setToken(null)
+        window.localStorage.removeItem('loggedBlogappUser')
+     
+      
     } catch (exception) {
       setIsError(true)
       setErrorMessage('Please login')
@@ -141,8 +136,7 @@ const App =() => {
 
   const handleRemove= async (id) => {
     const blog = blogs.find(n => n.id === id)
-    //console.log('blog contains '+JSON.stringify(blog));
-    //console.log('user '+JSON.stringify(user));
+ 
 
     try{
       let confirmToDelete=window.confirm(`remove blog ${blog.title} by ${blog.author}`)
