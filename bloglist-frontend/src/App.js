@@ -1,19 +1,23 @@
 import React ,{ useState, useEffect } from 'react'
 import Blog from './components/Blog'
 import Notification from './components/Notification'
-import LoginForm from './components/LoginForm'
+//import LoginForm from './components/LoginForm'
 import BlogForm from './components/BlogForm'
 import blogService from './services/blogs'
 import loginService from './services/login'
 import Togglable from './components/Togglable'
+import { useField } from './hooks'
 
 const App =() => {
 
   const [blogs, setBlogs] = useState([])
   const [errorMessage, setErrorMessage] = useState(null)
   const [isError,setIsError]=useState(true)
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
+  //const [username, setUsername] = useState('')
+  //const [password, setPassword] = useState('')
+  const username = useField('text')
+  const password = useField('password')
+  
   const [user, setUser] = useState(null)
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
@@ -43,15 +47,16 @@ const App =() => {
     event.preventDefault()
     try {
       const user = await loginService.login({
-        username, password,
+        username: username.value,
+        password: password.value
       })
       window.localStorage.setItem(
         'loggedBlogappUser', JSON.stringify(user)
       )
       blogService.setToken(user.token)
       setUser(user)
-      setUsername('')
-      setPassword('')
+      // setUsername('')
+      //setPassword('')
     } catch (exception) {
       setIsError(true)
       setErrorMessage('Wrong credentials')
@@ -69,8 +74,8 @@ const App =() => {
 
       blogService.setToken(null)
       setUser(null)
-      setUsername('')
-      setPassword('')
+      //setUsername('')
+      //setPassword('')
     } catch (exception) {
       setIsError(true)
       setErrorMessage('Please login')
@@ -160,7 +165,7 @@ const App =() => {
        )}
     </>
   )
-
+    
   //login form
   const loginForm = () => {
     const hideWhenVisible = { display: loginVisible ? 'none' : '' }
@@ -172,13 +177,21 @@ const App =() => {
           <button onClick={() => setLoginVisible(true)}>log in</button>
         </div>
         <div style={showWhenVisible}>
-          <LoginForm
-            username={username}
-            password={password}
-            handleUsernameChange={({ target }) => setUsername(target.value)}
-            handlePasswordChange={({ target }) => setPassword(target.value)}
-            handleSubmit={handleLogin}
-          />
+         <div>
+              <h2>Login</h2>
+
+              <form onSubmit={handleLogin}>
+                <div>
+                  username
+                  <input   {...username} />
+                </div>
+                <div>
+                  password
+                  <input  {...password} />
+                </div>
+                <button type="submit">login</button>
+              </form>
+            </div>
           <button onClick={() => setLoginVisible(false)}>cancel</button>
         </div>
       </div>
