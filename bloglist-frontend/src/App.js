@@ -15,9 +15,9 @@ const App =() => {
   const [isError,setIsError]=useState(true)
   //const [username, setUsername] = useState('')
   //const [password, setPassword] = useState('')
-  const username = useField('text')
-  const password = useField('password')
-  
+  const [username] = useField('text')
+  const [password] = useField('password')
+  const [reset] = useField('')
   const [user, setUser] = useState(null)
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
@@ -55,6 +55,8 @@ const App =() => {
       )
       blogService.setToken(user.token)
       setUser(user)
+      //username.reset()
+      // password.reset()
       // setUsername('')
       //setPassword('')
     } catch (exception) {
