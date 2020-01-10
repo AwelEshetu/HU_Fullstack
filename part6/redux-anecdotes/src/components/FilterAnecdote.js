@@ -1,11 +1,13 @@
 import React from 'react'
+import { connect } from 'react-redux'
+
 import { filter } from '../reducers/anecdoteReducer'
 const Filter = (props) => {
-    const store=props.store
+    
     //console.log('store from filter ',store.getState())
   const handleChange = (event) => {
     // input-field value is in variable event.target.value
-      store.dispatch(filter(event.target.value))
+      props.filter(event.target.value)
   }
   const style = {
     marginBottom: 10
@@ -17,5 +19,8 @@ const Filter = (props) => {
     </div>
   )
 }
+const mapDispatchToProps = {
+    filter
+}
 
-export default Filter
+export default connect(null,mapDispatchToProps)(Filter)

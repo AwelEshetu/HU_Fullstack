@@ -3,22 +3,29 @@ import AnecdoteForm  from './components/AnecdoteForm'
 import AnecdoteList from './components/AnecdoteList' 
 import Notification from './components/Notification'
 import Filter from './components/FilterAnecdote'
+import { connect } from 'react-redux'
+
 const App = (props) => {
-  const store=props.store
+
   
   return (
     <div>
       <div>
       <h2>Anecdotes</h2>
-      {store.getState().display ? <Notification store={store}/> : ''}
-      <Filter store={store} />
-      <AnecdoteForm store={store} />
+      {props.display ? <Notification /> : ''}
+      <Filter />
+      <AnecdoteForm  />
       
-      <AnecdoteList store={store} />
+      <AnecdoteList />
     </div>
       
     </div>
   )
 }
+const mapStateToProps = (state) => {
+  return {
+      display:state.display
+  }
+}
 
-export default App
+export default connect(mapStateToProps,null)(App)
