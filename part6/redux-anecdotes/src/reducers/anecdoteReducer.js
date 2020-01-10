@@ -35,8 +35,14 @@ export const vote=(id)=>{
         data: {id}
     }
 }
+export const filter=(query)=>{
+    return {
+        type: 'FILTER',
+        data:{query}
+    }
+}
 
-const reducer = (state = initialState, action) => {
+const anecdoteReducer = (state = initialState, action) => {
   console.log('state now: ', state)
   console.log('action', action)
     switch(action.type) {
@@ -52,9 +58,12 @@ const reducer = (state = initialState, action) => {
           return state.map(anecdote =>
             anecdote.id !== id ? anecdote : changedAnecdote 
           )
+        case 'FILTER':
+            const query = action.data.query
+            return state.filter(anecdote=>anecdote.content.includes(query))
         default:
             return state
     }
 }
 
-export default reducer
+export default anecdoteReducer
