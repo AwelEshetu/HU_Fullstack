@@ -4,10 +4,15 @@ import { connect } from 'react-redux'
 import {vote} from '../reducers/anecdoteReducer'
 import { setnotification } from '../reducers/notificationReducer'
 import { display }  from '../reducers/displayReducer'
+import anecdoteService from '../services/anecdotes'
+
 const AnecdoteList=(props)=>{
-    const handleClick=(anecdote)=>{
-        props.vote(anecdote.id)
-        props.setnotification(`You voted "${props.anecdotes.find(selected=>selected.id===anecdote.id).content}"`)
+   
+    const handleClick= async (anecdote)=>{
+        const updatedAnecdote = {...anecdote,votes:anecdote.votes+1}
+        const newAnecdote = await anecdoteService.update(anecdote.id,updatedAnecdote)
+        props.vote(newAnecdote.id)
+        props.setnotification(`You voted "${newAnecdote.content}"`)
         props.display(true)
         setTimeout(() => {
           props.display(false)
