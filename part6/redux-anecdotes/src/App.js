@@ -16,7 +16,7 @@ const App = (props) => {
     <div>
       <div>
       <h2>Anecdotes</h2>
-      {props.display ? <Notification /> : ''}
+      <Notification />
       <Filter />
       <AnecdoteForm  />
       

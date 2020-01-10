@@ -1,23 +1,32 @@
-const initialNotification='You can create new anecdote'
 
-export const setnotification=(content)=>{
-    return {
-         type: 'NOTIFICATION' ,
-         data: {content}
-    }
+const notificationReducer = (state = '', action) => {
+  if (action.type === 'SET_NOTIFICATION') {
+    return action.content
+  } else if (action.type === 'CLEAR_NOTIFICATION') {
+    return ''
+  }
+  return state
 }
 
-const notificationReducer=(state = initialNotification, action)=>{ 
-    console.log('state now: ', state)
-    console.log('action', action)
-    switch(action.type) {
-        case 'NOTIFICATION' :
-            
-           return action.data.content
-        default:
-            return state
-    }
+export const setNotification = (content, seconds) => {
+  return (dispatch) => {
+    dispatch({
+      type: 'SET_NOTIFICATION',
+      content
+    })
+    setTimeout(() => {
+      dispatch({
+        type: 'CLEAR_NOTIFICATION',
+      })
+    }, seconds*1000)
+  }
+
 }
 
+export const clearNotification = () => (
+  {
+    type: 'CLEAR_NOTIFICATION'
+  }
+)
 
 export default notificationReducer
