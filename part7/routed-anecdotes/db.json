@@ -1,0 +1,60 @@
+{
+  "anecdotes": [
+    {
+      "content": "If it hurts, do it more often",
+      "author": "Jez Humble",
+      "info": "https://martinfowler.com/bliki/FrequencyReducesDifficulty.html",
+      "votes": 0,
+      "id": "1"
+    },
+    {
+      "content": "Premature optimization is the root of all evil",
+      "author": "Donald Knuth",
+      "info": "http://wiki.c2.com/?PrematureOptimization",
+      "votes": 0,
+      "id": "2"
+    },
+    {
+      "content": "does it really work now ? ",
+      "author": "Awel Eshetu",
+      "info": "https://fullstackopen.com/en/part7/more_about_styles",
+      "id": "7875",
+      "votes": 0
+    },
+    {
+      "content": "is this really now working better ? ",
+      "author": "Awel Eshetu",
+      "info": "https://fullstackopen.com/en/part7/react_router",
+      "id": "7039",
+      "votes": 0
+    },
+    {
+      "content": "Hello world from countryside",
+      "author": "Awel Eshetu",
+      "info": "https://fullstackopen.com/en/part7/exercises_extending_the_bloglist",
+      "id": "8815",
+      "votes": 0
+    },
+    {
+      "content": "break it now not later !",
+      "author": "Awel Eshetu",
+      "info": "https://fullstackopen.com/en/part7/more_about_styles",
+      "id": "2850",
+      "votes": 0
+    },
+    {
+      "content": "Here is to test the notification working",
+      "author": "Awel Eshetu",
+      "info": "https://github.com/AwelEshetu/HU_Fullstack",
+      "id": "8639",
+      "votes": 0
+    },
+    {
+      "content": "Everything uses redux now ",
+      "author": "Awel Eshetu",
+      "info": "https://fullstackopen.com/en/part7/react_router",
+      "id": "5854",
+      "votes": 0
+    }
+  ]
+}
